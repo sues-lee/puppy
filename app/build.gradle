@@ -40,6 +40,11 @@ android {
         jvmTarget = "1.8"
     }
 
+    compileOptions {
+        targetCompatibility JavaVersion.VERSION_11
+        sourceCompatibility JavaVersion.VERSION_11
+    }
+
     buildFeatures {
         compose true
 
@@ -79,6 +84,8 @@ dependencies {
     implementation "androidx.compose.runtime:runtime-livedata:$compose_version"
 
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.3.0'
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.0"
+    implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.3.0"
 
     testImplementation 'junit:junit:4.13.2'
 

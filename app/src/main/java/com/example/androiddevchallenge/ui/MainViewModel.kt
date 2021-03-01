@@ -2,6 +2,8 @@ package com.example.androiddevchallenge.ui
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.androiddevchallenge.R
 import com.example.androiddevchallenge.model.DogInfo
@@ -55,4 +57,19 @@ class MainViewModel: ViewModel() {
             ),
         )
     )
+
+    private val _selectedDog = MutableLiveData<DogInfo?>()
+    val selectedDog:LiveData<DogInfo?> = _selectedDog
+
+    fun showDogDetail(dogInfo: DogInfo){
+        _selectedDog.value = dogInfo
+    }
+
+    fun closeDogInfo(){
+        _selectedDog.value = null
+    }
+
+    fun adoptDog(dogInfo: DogInfo){
+
+    }
 }

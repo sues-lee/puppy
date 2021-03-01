@@ -20,44 +20,44 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatViewInflater
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.*
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Button
-import androidx.compose.material.Card
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.VerifiedUser
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight.Companion.W700
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import com.example.androiddevchallenge.data.default_card_padding
 import com.example.androiddevchallenge.model.DogInfo
 import com.example.androiddevchallenge.ui.MainViewModel
+import com.example.androiddevchallenge.ui.page.DogDetailPage
 import com.example.androiddevchallenge.ui.theme.MyTheme
 
 class MainActivity : AppCompatActivity() {
 
     private val viewModel by viewModels<MainViewModel>()
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             MyTheme {
-                MyApp(viewModel.dogs)
+                MyApp(viewModel)
             }
         }
     }
@@ -65,61 +65,91 @@ class MainActivity : AppCompatActivity() {
 
 // Start building your app here!
 @Composable
-fun MyApp(dogList: List<DogInfo>) {
+fun MyApp(viewModel: MainViewModel ) {
+    val currentDog: DogInfo? by viewModel.selectedDog.observeAsState(null)
+
     Surface(color = MaterialTheme.colors.background) {
 
-        LazyColumn{
-            dogList.forEach {
-                item {
-                    Card(
-                        modifier = Modifier.padding(8.dp),
-                        elevation = 1.dp
-                    ) {
-                        InfoCard(it)
+        if (currentDog != null){
+            //show dog detail
+            DogDetailPage(dog = currentDog!!,viewModel)
+        }else{
+            //show dog list
+            Column {
+                PuppiesListTopBar()
+                LazyColumn{
+                    items(viewModel.dogs) {
+                        InfoCard(it){ dog ->
+                            viewModel.showDogDetail(dog)
+                        }
                     }
                 }
             }
         }
 
     }
+
 }
 
 @Composable
-fun InfoCard(dogInfo: DogInfo){
-    Column(
-        Modifier
-            .background(color = Color.White)
-            .padding(default_card_padding)
+fun PuppiesListTopBar() {
+    Box(
+        modifier = Modifier
             .fillMaxWidth()
+            .requiredHeight(56.dp)
+            .padding(8.dp),
+        contentAlignment = Alignment.CenterEnd,
     ) {
-        Column {
-            Text(dogInfo.name)
-            Text(dogInfo.age)
-        }
-        
-        Spacer(Modifier.size(6.dp))
-        
-        Card(elevation = 4.dp) {
-            Image(
-                painterResource(dogInfo.picture),
-                "Dog picture: ${dogInfo.name}",
-                Modifier.aspectRatio(2f),
-                contentScale = ContentScale.Crop
+        Row {
+            Text(text = "Log in")
+            Spacer(modifier = Modifier.size(4.dp))
+            Icon(
+                modifier = Modifier.size(24.dp),
+                imageVector = Icons.Default.AccountCircle,
+                contentDescription = null,
+                tint = MaterialTheme.colors.primary,
             )
         }
+
     }
 }
 
-@Preview
 @Composable
-fun cardPreview(){
-    MyTheme {
-        InfoCard(  DogInfo(
-            "Nala", "Pit Bull Terrier Mix", "Sunnyvale, CA",
-            "Adult", "Female", "Large", R.drawable.img_puppy_nala
-        ))
+fun InfoCard(dogInfo: DogInfo,onClick:(DogInfo) -> Unit){
+    Card(
+        modifier = Modifier
+            .padding(8.dp)
+            .clickable {
+                onClick(dogInfo)
+            },
+        elevation = 1.dp
+    ) {
+        Column(
+            Modifier
+                .background(color = Color.White)
+                .padding(default_card_padding)
+                .fillMaxWidth()
+
+        ) {
+            Column {
+                Text(dogInfo.name, style = MaterialTheme.typography.h6)
+                Text(dogInfo.gender)
+            }
+
+            Spacer(Modifier.size(6.dp))
+
+            Card(elevation = 4.dp) {
+                Image(
+                    painterResource(dogInfo.picture),
+                    "Dog picture: ${dogInfo.name}",
+                    Modifier.aspectRatio(2f),
+                    contentScale = ContentScale.Crop
+                )
+            }
+        }
     }
 }
+
 
 @Preview("Light Theme", widthDp = 360, heightDp = 640)
 @Composable
