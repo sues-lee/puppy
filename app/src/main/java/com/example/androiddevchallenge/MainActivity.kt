@@ -17,20 +17,47 @@ package com.example.androiddevchallenge
 
 import android.os.Bundle
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatViewInflater
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.Button
+import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModel
+import com.example.androiddevchallenge.data.default_card_padding
+import com.example.androiddevchallenge.model.DogInfo
+import com.example.androiddevchallenge.ui.MainViewModel
 import com.example.androiddevchallenge.ui.theme.MyTheme
 
 class MainActivity : AppCompatActivity() {
+
+    private val viewModel by viewModels<MainViewModel>()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             MyTheme {
-                MyApp()
+                MyApp(viewModel.dogs)
             }
         }
     }
@@ -38,9 +65,59 @@ class MainActivity : AppCompatActivity() {
 
 // Start building your app here!
 @Composable
-fun MyApp() {
+fun MyApp(dogList: List<DogInfo>) {
     Surface(color = MaterialTheme.colors.background) {
-        Text(text = "Ready... Set... GO!")
+
+        LazyColumn{
+            dogList.forEach {
+                item {
+                    Card(
+                        modifier = Modifier.padding(8.dp),
+                        elevation = 1.dp
+                    ) {
+                        InfoCard(it)
+                    }
+                }
+            }
+        }
+
+    }
+}
+
+@Composable
+fun InfoCard(dogInfo: DogInfo){
+    Column(
+        Modifier
+            .background(color = Color.White)
+            .padding(default_card_padding)
+            .fillMaxWidth()
+    ) {
+        Column {
+            Text(dogInfo.name)
+            Text(dogInfo.age)
+        }
+        
+        Spacer(Modifier.size(6.dp))
+        
+        Card(elevation = 4.dp) {
+            Image(
+                painterResource(dogInfo.picture),
+                "Dog picture: ${dogInfo.name}",
+                Modifier.aspectRatio(2f),
+                contentScale = ContentScale.Crop
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+fun cardPreview(){
+    MyTheme {
+        InfoCard(  DogInfo(
+            "Nala", "Pit Bull Terrier Mix", "Sunnyvale, CA",
+            "Adult", "Female", "Large", R.drawable.img_puppy_nala
+        ))
     }
 }
 
@@ -48,7 +125,7 @@ fun MyApp() {
 @Composable
 fun LightPreview() {
     MyTheme {
-        MyApp()
+        // MyApp()
     }
 }
 
@@ -56,6 +133,6 @@ fun LightPreview() {
 @Composable
 fun DarkPreview() {
     MyTheme(darkTheme = true) {
-        MyApp()
+        // MyApp()
     }
 }
