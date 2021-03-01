@@ -78,10 +78,10 @@ fun MyApp(viewModel: MainViewModel) {
     Surface(color = MaterialTheme.colors.background) {
 
         if (currentDog != null) {
-            //show dog detail
+            // show dog detail
             DogDetailPage(dog = currentDog!!, viewModel)
         } else {
-            //show dog list
+            // show dog list
             Column {
                 PuppiesListTopBar()
                 LazyColumn {
@@ -93,7 +93,6 @@ fun MyApp(viewModel: MainViewModel) {
                 }
             }
         }
-
     }
 }
 
@@ -116,7 +115,6 @@ fun PuppiesListTopBar() {
                 tint = MaterialTheme.colors.primary,
             )
         }
-
     }
 }
 
